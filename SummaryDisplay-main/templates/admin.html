@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hospital Summary Generator - Admin Panel">
+    <title>Admin Panel | Hospital Dashboard</title>
+    
+    <!-- Fonts and Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/admin.css" rel="stylesheet">
+    
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js" defer></script>
+    
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='fevicon.png') }}">
+</head>
+
+<body class="admin-body">
+    <main class="container mt-5 admin-container">
+        <header class="page-header mb-5 fade-in">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="admin-heading">Welcome, {{ username }}</h1>
+                <div class="theme-toggle">
+                    <!-- <label class="switch" for="darkModeToggle">
+                        <input type="checkbox" id="darkModeToggle" class="toggle-input">
+                        <span class="slider round"></span>
+                        <span class="toggle-label">Dark Mode</span>
+                    </label> -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <section class="notifications mb-4" aria-label="Notifications">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+        {% endwith %}
+
+        <section class="card add-user-section mb-5 slide-up">
+            <div class="card-body p-4">
+                <h2 class="section-heading h4">Add New User</h2>
+                <form method="POST" action="{{ url_for('admin') }}" class="add-user-form">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" 
+                                       id="username" 
+                                       name="username" 
+                                       class="form-control" 
+                                       placeholder="Username"
+                                       required>
+                                <label for="username">Username</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="password" 
+                                       id="password" 
+                                       name="password" 
+                                       class="form-control"
+                                       placeholder="Password"
+                                       required>
+                                <label for="password">Password</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <select id="role" 
+                                        name="role" 
+                                        class="form-select"
+                                        required>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                                <label for="role">Role</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-end mt-4">
+                        <button type="submit" class="button button-primary">
+                            <span>Add User</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="users-section mb-5 fade-in">
+            <h2 class="section-heading h4 mb-4">All Users</h2>
+            <div class="table-container">
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="user-row">
+                            <td>{{ user[0] }}</td>
+                            <td>{{ user[1] }}</td>
+                            <td>
+                                <span class="badge rounded-pill bg-{{ 'primary' if user[2] == 'user' else 'success' }}">
+                                    {{ user[2] }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons d-flex gap-2">
+                                    <a href="{{ url_for('update_user', user_id=user[0]) }}" 
+                                       class="button button-secondary">Update</a>
+                                    <form method="POST" 
+                                          action="{{ url_for('delete_user', user_id=user[0]) }}" 
+                                          class="d-inline delete-form">
+                                        <button type="submit" class="button button-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer mt-auto py-4">
+        <div class="container">
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <a href="{{ url_for('dashboard') }}" class="button button-secondary">
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('logout') }}" class="button button-danger">
+                    <span>Logout</span>
+                </a>
+            </div>
+            <div class="text-center">
+                <p class="text-muted mb-0">&copy; 2025 SFON Technologies. Built & Executed by Mir Abdul Aziz Khan and Mohammed Irfan.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="static/admin.js"></script>
+</body>
+</html>

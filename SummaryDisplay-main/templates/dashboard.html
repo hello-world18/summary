@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hospital Summary Generator Dashboard - Comprehensive medical data management system">
+    <title>OHRC Summary Report</title>
+    
+    <!-- Fonts and Styles -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/dashboard.css">
+    
+    <!-- GSAP and ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js" defer></script>
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='fevicon.png') }}">
+</head>
+
+<body class="light-mode">
+   
+
+    <main class="dashboard-container container mt-5">
+        <section class="hero-section text-center mb-5 fade-in">
+            <h1 class="welcome-title display-4 mb-3">Welcome, {{ username }}</h1>
+            <div class="role-badge mb-4">
+                <span class="badge rounded-pill bg-primary px-4 py-2">
+                    <strong class="role-text">{{ role }}</strong>
+                </span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="button logout-btn">
+                <span>Logout</span>
+            </a>
+        </section>
+
+        <section class="file-management mb-5 slide-up">
+            <h2 class="section-title text-center mb-4">File Management</h2>
+            
+            <article class="card retrieve-card mb-4">
+                <div class="card-body p-4">
+                    <h3 class="card-title h4 mb-4">Retrieve Files</h3>
+                    {% with messages = get_flashed_messages(category_filter=["retrieve_success", "retrieve_error"]) %}
+                    {% if messages %}
+                    <div class="alert alert-custom fade show" role="alert">
+                        <div class="alert-body">{{ messages[0] }}</div>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <form method="GET" action="{{ url_for('retrieve_files') }}" class="retrieve-form">
+                        <div class="form-floating mb-4">
+                            <input type="date" id="retrieve_date" name="date" class="form-control" required>
+                            <label for="retrieve_date">Select Date</label>
+                        </div>
+                        <button type="submit" class="button">
+                            <span>Retrieve Files</span>
+                        </button>
+                    </form>
+                </div>
+            </article>
+
+            {% if files %}
+            <article class="card files-card fade-in">
+                <div class="card-body p-4">
+                    <h4 class="mb-4">Files Uploaded on {{ search_date }}</h4>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>File Path</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for file in files %}
+                                <tr class="file-row">
+                                    <td>{{ file[8] }}</td>
+                                    <td>
+                                        <a href="{{ url_for('summarize_file', file_id=file[0]) }}" 
+                                           class="button button-sm">
+                                            <span>Summary</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </article>
+            {% endif %}
+        </section>
+
+        {% if role == 'admin' %}
+        <section class="admin-section mb-5 slide-up">
+            <article class="card upload-card mb-4">
+                <div class="card-body p-4">
+                    <h3 class="card-title h4 mb-4">Upload Files</h3>
+                    {% with messages = get_flashed_messages(category_filter=["upload_success", "upload_error"]) %}
+                    {% if messages %}
+                    <div class="alert alert-custom fade show" role="alert">
+                        <div class="alert-body">{{ messages[0] }}</div>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('upload_file') }}" 
+                          enctype="multipart/form-data" 
+                          class="upload-form">
+                        <div class="row g-4">
+                            {% for field in ['date', 'visitRegister', 'BedOccupancy', 'IpdDischarge', 'LISTestRegister', 'OTRegister', 'DWSReport','RISRegister'] %}
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="{% if field == 'date' %}date{% else %}file{% endif %}" 
+                                           id="{{ field }}" 
+                                           name="{{ field }}" 
+                                           class="form-control"
+                                           {% if field != 'date' %}accept=".xls,.xlsx"{% endif %}
+                                           required>
+                                    <label for="{{ field }}">{{ field.replace('_', ' ').title() }}</label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="button">
+                                <span>Upload Files</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+
+            <nav class="admin-nav d-flex justify-content-center gap-3">
+                <a href="{{ url_for('admin') }}" class="button">
+                    <span>View Users</span>
+                </a>
+                <a href="{{ url_for('departments') }}" class="button">
+                    <span>View Departments</span>
+                </a>
+                <a href="{{ url_for('user_stats') }}" class="button">
+                    <span>Login Stats</span>
+                </a>
+            </nav>
+        </section>
+        {% endif %}
+    </main>
+
+    <footer class="footer mt-auto py-4 fade-in">
+        <div class="container text-center">
+            <p class="text-muted mb-0">&copy; 2025 SFON Technologies. Built & Executed by Syed Mohd Ghouse, Mir Abdul Aziz Khan and Mohammed Irfan.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Remove extra script reference -->
+    <!-- <script src="../static/dashboard.js"></script> -->
+     
+</body>
+</html>

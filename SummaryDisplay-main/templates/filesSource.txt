@@ -1,0 +1,14 @@
+File:
+    visit register -> select date ->detail->show ->download in excel format
+Bed Occupancy:
+    ipd -> departmental reports -> bed occupancy status=not billed ->select date -> show ->download in excel format
+    after downloading: delete admit patient detail row and every row above it 
+Biopsy:
+    departmentwise statistics report -> select date ->show ->download in excel format
+Ipd Discharge: 
+    ipd -> departmental reports -> Admission/Discharge Patient Report -> select date -> type=discharge ->detail->show ->download in excel format
+OT : 
+    OT register detail report ->select date->detail->show ->download in excel format
+LIS:
+    LIS Test Register -> date ->show ->download in excel format
+    
